@@ -35,7 +35,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     public void configure(WebSecurity web) throws Exception {
         //排除资源
-        web.ignoring().antMatchers("/druid/**","/user/**","/favicon.ico","/css/**","/img/**","/js/**","/login.html");
+        web.ignoring().antMatchers("/druid/**","/favicon.ico","/css/**","/img/**","/js/**","/login.html");
     }
 
     //一旦重写了此类,SpringSecurity的默认流程将失效
@@ -53,12 +53,14 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 //登录逻辑验证 post方法
                 .loginProcessingUrl("/login")
                 //登入成功逻辑 新增get方法 如果要重定向,调用重载方法,在后加true
-                .defaultSuccessUrl("/success")
+                .defaultSuccessUrl("/success",true)
                 // 自定义登录失败处理
                 .failureHandler(securityAuthenticationFailureHandler);
         // 自定义权限不足处理
         http.exceptionHandling().accessDeniedHandler(securityAccessDeniedHandler);
         //请求路径验证(配合权限验证)
-        http.authorizeRequests().antMatchers("/login").permitAll().anyRequest().authenticated();
+        http.authorizeRequests().antMatchers("/login").permitAll()
+                .antMatchers("/user/add").hasRole("admin")
+                .anyRequest().authenticated();
     }
 }

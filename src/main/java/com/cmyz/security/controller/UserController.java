@@ -4,7 +4,8 @@ import cn.hutool.core.util.StrUtil;
 import com.cmyz.security.pojo.Result;
 import com.cmyz.security.pojo.User;
 import com.cmyz.security.service.UserService;
-import org.springframework.security.access.annotation.Secured;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -21,7 +22,7 @@ public class UserController {
     private UserService userService;
 
     @PostMapping("/add")
-    public Result<Object> addUser(@RequestBody User user){
+    public Result<Object> addUser(User user){
         if (!StrUtil.isBlank(user.getUsername())&&!StrUtil.isBlank(user.getPassword())){
             boolean save = userService.save(user);
             if (save){
@@ -35,7 +36,6 @@ public class UserController {
     }
 
     @GetMapping("/{id}")
-    @Secured({"ROLE_admin"})
     public Result<Object> getUser(@PathVariable Integer id){
         if (id!=null&&id>0){
             User user = userService.getById(id);

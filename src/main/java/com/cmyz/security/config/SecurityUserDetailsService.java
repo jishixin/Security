@@ -1,5 +1,6 @@
 package com.cmyz.security.config;
 
+import cn.hutool.core.collection.CollUtil;
 import com.cmyz.security.pojo.User;
 import com.cmyz.security.service.UserService;
 import org.springframework.security.core.authority.AuthorityUtils;
@@ -9,6 +10,9 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * 用户登录验证逻辑重写
@@ -32,10 +36,21 @@ public class SecurityUserDetailsService implements UserDetailsService {
             throw new UsernameNotFoundException("用户名错误!");
         }
         System.err.println("登录用户:"+user);
+        //获取角色和权限
+        List<String> roles = userService.getRolesById(user.getId());
+        List<String> resources = userService.getResourcesById(user.getId());
+        //在SpringSecurity中对角色的命名有严格的要求,要求角色名称的前缀必须是 'ROLE_',一般在此处拼接,不写入数据库
+        //在SpringSecurity中角色和权限是平等的,都代表用户的访问权限
+        List<String> authorities = new ArrayList<>();
+        for (String role : roles) {
+            authorities.add("ROLE_"+role);
+        }
+        authorities.addAll(resources);
+        System.err.println("用户权限为:"+authorities);
+        String[] strings = new String[authorities.size()];
+        authorities.toArray(strings);
         //返回值使用的是SpringSecurity提供的User对象,用户名,用户正确密码,权限集合
         //AuthorityUtils 可以通过字符串创建集合
-        org.springframework.security.core.userdetails.User result
-                = new org.springframework.security.core.userdetails.User(username,user.getPassword(), AuthorityUtils.createAuthorityList("ROLE_admin"));
-        return result;
+        return new org.springframework.security.core.userdetails.User(username,user.getPassword(), AuthorityUtils.createAuthorityList(strings));
     }
 }

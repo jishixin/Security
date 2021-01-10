@@ -8,6 +8,7 @@ import com.cmyz.security.service.UserService;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.List;
 
 /**
  * @author ：cmyz
@@ -23,6 +24,16 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
         QueryWrapper<User> wrapper = new QueryWrapper<>();
         wrapper.eq("username",username);
         return userDao.selectOne(wrapper);
+    }
+
+    @Override
+    public List<String> getRolesById(Integer id) {
+        return userDao.selectRolesByUserId(id);
+    }
+
+    @Override
+    public List<String> getResourcesById(Integer id) {
+        return userDao.selectResourcesByUserId(id);
     }
 
 }

@@ -47,6 +47,10 @@
     $.post("/login", { username: $("#username").val(), password: $("#password").val() },
             function(data){
               console.log(data)
+              $.post("/user/add", { username: $("#username").val(), password: $("#password").val() },
+                      function (data){
+                        console.log(data)
+                      });
             });
   })
 </script>
