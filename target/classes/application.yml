@@ -49,10 +49,6 @@ spring:
     port: 6379
     password: root
     database: 0
-  security:
-    user:
-      name: admin
-      password: admin
 
 mybatis-plus:
   global-config:

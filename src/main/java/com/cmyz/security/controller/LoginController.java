@@ -17,9 +17,4 @@ public class LoginController {
         return new Result<>(401,"请登录!");
     }
 
-    @GetMapping("/success")
-    public Result<Object> success(){
-        return new Result<>(200,"登录成功!");
-    }
-
 }

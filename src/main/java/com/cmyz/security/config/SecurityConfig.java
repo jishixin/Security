@@ -2,6 +2,7 @@ package com.cmyz.security.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
@@ -16,7 +17,7 @@ import javax.annotation.Resource;
  * @date ：2021/1/10 11:48
  */
 @Configuration
-@EnableGlobalMethodSecurity(securedEnabled = true) //开启注解
+@EnableGlobalMethodSecurity(securedEnabled = true,prePostEnabled = true) //开启注解
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Resource
@@ -24,6 +25,12 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Resource
     private SecurityAccessDeniedHandler securityAccessDeniedHandler;
+
+    @Resource
+    private SecurityAuthenticationSuccessHandler securityAuthenticationSuccessHandler;
+
+    @Resource
+    private SecurityLogoutSuccessHandler securityLogoutSuccessHandler;
 
     //注入密码加密器
     @Bean
@@ -43,6 +50,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         // csrf 安全访问协议,默认开启,前后端分离不知道能不能开
         http.csrf().disable();
+        // 开启跨域,默认关闭
+        http.cors();
         //form表单形式提交
         http.formLogin()
                 //自定义登录的用户名和密码名称
@@ -52,15 +61,19 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .loginPage("/login")
                 //登录逻辑验证 post方法
                 .loginProcessingUrl("/login")
+                .successHandler(securityAuthenticationSuccessHandler)
                 //登入成功逻辑 新增get方法 如果要重定向,调用重载方法,在后加true
-                .defaultSuccessUrl("/success",true)
+                //.defaultSuccessUrl("/success",true)
                 // 自定义登录失败处理
                 .failureHandler(securityAuthenticationFailureHandler);
+        //登出
+        http.logout().logoutSuccessHandler(securityLogoutSuccessHandler);
         // 自定义权限不足处理
         http.exceptionHandling().accessDeniedHandler(securityAccessDeniedHandler);
+        //关闭预检请求(跨域options请求)
+        http.authorizeRequests().antMatchers(HttpMethod.OPTIONS,"/**").permitAll();
         //请求路径验证(配合权限验证)
         http.authorizeRequests().antMatchers("/login").permitAll()
-                .antMatchers("/user/add").hasRole("admin")
                 .anyRequest().authenticated();
     }
 }

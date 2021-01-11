@@ -51,6 +51,7 @@ public class SecurityUserDetailsService implements UserDetailsService {
         authorities.toArray(strings);
         //返回值使用的是SpringSecurity提供的User对象,用户名,用户正确密码,权限集合
         //AuthorityUtils 可以通过字符串创建集合
-        return new org.springframework.security.core.userdetails.User(username,user.getPassword(), AuthorityUtils.createAuthorityList(strings));
+        return new org.springframework.security.core.userdetails.User(username,user.getPassword()
+                , AuthorityUtils.createAuthorityList(strings));
     }
 }
