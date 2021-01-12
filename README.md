@@ -86,7 +86,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 }
 ```
 
-## 开启跨域(SpringWebMvc)
+## 开启跨域
+SpringWebMvc配置：
 ```java
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
@@ -101,6 +102,20 @@ public class WebConfig implements WebMvcConfigurer {
                 .exposedHeaders(HttpHeaders.SET_COOKIE) //配置响应的头信息,在其中可以设置其他的头信息
                 .maxAge(3600); //配置预检请求的有效时间
     }
+}
+```
+SpringSecurity配置：
+```java
+//開啓跨域
+http.cors();
+http.authorizeRequests().antMatchers(HttpMethod.OPTIONS, "/**").permitAll();
+```
+跨域请求配置：
+开启携带跨域Cookie功能即可
+列如：ajax请求
+```javascript
+xhrFields: {
+    withCredentials: true,
 }
 ```
 
